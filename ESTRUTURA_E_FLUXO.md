@@ -53,35 +53,13 @@ Este arquivo é lido **somente pelo script `02_carga_dados.py`**. Nenhum outro a
 
 ---
 
-### `Projetobd.pdf`
-Enunciado original fornecido pelo professor. Descreve as etapas esperadas: ER, modelo relacional, DDL, carga, EDA. Serve apenas como referência — não é executado.
-
----
-
-### `gerar_slides.py`
-Script Python que gera o arquivo `Documentacao/apresentacao_oscar.pptx` usando a biblioteca `python-pptx`.
-
-**Como executar:**
-```bash
-python gerar_slides.py
-```
-
-**O que faz:**
-1. Define funções auxiliares para criar slides com fundo preto/dourado (tema Oscar)
-2. Monta 14 slides com conteúdo fixo (sem conexão com o banco)
-3. Salva o `.pptx` em `Documentacao/apresentacao_oscar.pptx`
-
-**Dependência:** `pip install python-pptx`
-
----
-
 ## Pasta `Documentacao/`
 
-Contém todas as entregas formais do projeto, organizadas por etapa.
+Contém todas as entregas formais do projeto, organizadas por etapa de criação e desenvolvimento.
 
 ---
 
-### `Etapa0_Exploracao/`
+### `Etapa0_Exploracao/` Pré-processamento
 
 #### `01_exploracao.ipynb`
 Notebook Jupyter de exploração inicial do dataset. É o **primeiro arquivo a ser executado** no projeto.
@@ -92,7 +70,7 @@ Notebook Jupyter de exploração inicial do dataset. É o **primeiro arquivo a s
 1. Instala dependências (`pandas`, `matplotlib`) se necessário
 2. Lê `world_ampas_oscar_winner_demographics.csv` com `pd.read_csv()`
 3. Exibe `df.shape`, `df.dtypes`, `df.head()` — visão geral
-4. Conta valores nulos por coluna — revela 62% de ausência em `religion`
+4. Conta valores nulos por coluna — (revela 62% de ausência em `religion`)
 5. Identifica `"Na"` em `sexual_orientation` como string especial (não NULL real)
 6. Calcula cardinalidades: edições únicas (87), categorias (5), filmes (335), vencedores (348)
 7. Plota distribuições: prêmios por etnia, prêmios por categoria, prêmios por década
@@ -105,22 +83,21 @@ Notebook Jupyter de exploração inicial do dataset. É o **primeiro arquivo a s
 ### `Etapa1_ModeloER/`
 
 #### `diagrama_er.dbml`
-Definição do diagrama ER em DBML (Database Markup Language), formato usado pelo site [dbdiagram.io](https://dbdiagram.io).
+Definição do diagrama ER em DBML (Database Markup Language), formato usado pelo site para geração autmática do diagrama visual pelo site: [dbdiagram.io](https://dbdiagram.io).
 
 **Conteúdo:** define 5 tabelas (`vencedor`, `filme`, `categoria`, `edicao`, `premio`) com seus campos, tipos e relacionamentos (FKs).
 
-**Como usar:** copiar o conteúdo e colar no editor de [dbdiagram.io](https://dbdiagram.io) para gerar o diagrama visualmente.
+**Como fizemos:** copiamos o conteúdo e colamos no editor de [dbdiagram.io](https://dbdiagram.io) para gerar o diagrama visualmente.
 
 **Não é executado diretamente.** É um arquivo de documentação/modelagem.
 
 #### `oscar.png` e `oscar.svg`
-Imagens exportadas do diagrama ER gerado no dbdiagram.io. Usadas no relatório e na apresentação.
-
+Imagens exportadas do diagrama ER gerado no dbdiagram.io.
 ---
 
 ### `Etapa3_SQL/`
 
-Esta pasta contém os três scripts que implementam e populam o banco. **Devem ser executados nesta ordem:**
+Aqui temos três scripts que implementam e preenchem o banco. **Devem ser executados nesta ordem:**
 
 ```
 01_ddl_criar_tabelas.sql  →  02_carga_dados.py  →  03_validacao_carga.sql
@@ -206,13 +183,6 @@ docker exec oscar-db psql -U postgres -d oscar -f /tmp/val.sql
 | 6 | Categorias distintas — deve ser exatamente 5 | 5 linhas |
 | 7 | Distribuição de vencedores por etnia | White dominante, outros menores |
 | 8 | Edições com ≠ 5 prêmios | 30 edições (estrutural — décadas iniciais) |
-
----
-
-#### `01_exploracao.ipynb` (dentro de Etapa3_SQL)
-Notebook remanescente do dataset anterior (Brasileirão). **Não é usado** no projeto atual. Pode ser ignorado.
-
----
 
 ### `Etapa4_EDA/`
 
