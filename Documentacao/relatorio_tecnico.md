@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 # Relatório — Projeto Final de Banco de Dados
 **Disciplina:** Banco de Dados — DCC/UFMG  
@@ -22,6 +22,8 @@ O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o pe
 ---
 
 ## 2. Dataset
+
+A base de dados utilizada, "World Oscar AMPAS winner demographics", contém dados a respeito das categorias: Melhor Atriz, Melhor Ator, Melhor Diretor, Melhor Ator Coadjuvante, Melhor Atriz Coadjuvante, para as edições da premiação que ocorreram entre 1927 e 2014. Os atributos do dataset e a relação das variáveis presentes está mostrada na tabela a seguir:
 
 | Atributo | Valor |
 |---|---|
@@ -47,6 +49,8 @@ O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o pe
 | movie | texto | Filme premiado |
 
 ### Tratamento de dados ausentes
+Foram realizadas os seguintes tratamentos na base original importada:
+
 - `religion`: 62% de ausência estrutural — dado não coletado para todos os vencedores históricos. Tratado como `NULL`.
 - `sexual_orientation`: string `"Na"` convertida para `NULL` na carga.
 - `birth_date`: 1 registro ausente; `birth_year` mantido para não perder informação.
