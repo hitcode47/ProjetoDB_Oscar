@@ -14,6 +14,8 @@ output:
 
 Este projeto implementa o ciclo completo de um banco de dados relacional sobre os vencedores do Oscar (Academy Awards), premiação anual da Academia de Artes e Ciências Cinematográficas dos Estados Unidos (AMPAS). O dataset contém informações demográficas de vencedores de cinco categorias principais entre 1927 e 2014, permitindo análises sobre representatividade étnica, longevidade de carreira e domínio artístico ao longo de quase nove décadas de cinema.
 
+As etapas de um projeto de banco de dados desenvolvidas partem do projeto conceitual Entidade-Relacionamento, que é depois convertido num modelo Relacional e testado sobre as premissas das 3 formas normais. Os modelos projetados são então implementados em SQL por meio da Data Definition language (DDL) e a base de dados resultante é populada com o arquivo csv. Antes de se executar as análises e consultas SQL, um tratamento é feito, seguido da análise exploratópria dos dados.
+
 ### Motivação
 O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o perfil dos vencedores ao longo do tempo revela padrões históricos de diversidade — ou ausência dela — na indústria do cinema.
 
@@ -70,7 +72,8 @@ O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o pe
 - Um filme pode vencer múltiplas categorias na mesma edição.
 
 ### Diagrama ER
-Gerado via dbdiagram.io a partir do arquivo `Etapa1_ModeloER/diagrama_er.dbml`.
+
+![](Etapa1_ModeloER/OSCAR_ER.png)
 
 ---
 
