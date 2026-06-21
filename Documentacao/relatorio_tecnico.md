@@ -45,7 +45,7 @@ A base de dados utilizada, "World Oscar AMPAS winner demographics", contém dado
 | religion | texto | Religião — 62% ausente |
 | sexual_orientation | texto | Orientação sexual — "Na" tratado como NULL |
 | year_edition | inteiro | Ano da cerimônia |
-| category | texto | Categoria do Oscar (5 categorias) |
+| category | texto | Categoria do Oscar (5 categorias: Melhor Atriz, Melhor Ator, Melhor Diretor, Melhor Ator Coadjuvante, Melhor Atriz Coadjuvante) |
 | movie | texto | Filme premiado |
 
 ### Tratamento de dados ausentes
@@ -67,21 +67,110 @@ Foram realizadas os seguintes tratamentos na base original importada:
 | FILME | titulo | id_filme |
 | CATEGORIA | nome | id_categoria |
 | EDICAO | ano | id_edicao |
-| PREMIO | — (somente FKs) | id_premio |
+| PREMIO | id_vencedor, id_filme, id_categoria, id_edicao | id_premio |
 
 ### Relacionamentos
-- `PREMIO` é uma **entidade associativa** que conecta as quatro dimensões.
-- Todos os relacionamentos são **N:1** de PREMIO para as demais entidades.
-- Um vencedor pode ter múltiplos prêmios (ex: Katharine Hepburn — 4 Oscars).
-- Um filme pode vencer múltiplas categorias na mesma edição.
+
+O projeto para o banco de dados considerou a criação de `PREMIO`, que é uma **entidade associativa** que conecta as quatro demais entidades. `PREMIO` permite que VENCEDOR, FILME, EDICAO e CATEGORIA se relacionem diretamente, de forma que caracterizem uma entrada na base de dados, ou seja, cada `PREMIO` corresponde a uma das categorias do Oscar em determinada edição, da qual houve um vencedor por causa de determinado filme.
+
+Nessa estruturação, é obrigatório que cada uma dessas 4 entidades possuam uma respectiva entrada nas demais 3 que se associem a ela, caracterizando uma participação total. A entidade associativa caracteriza um relacionamento M:N.
+
 
 ### Diagrama ER
 
+O diagrama a seguir representa o esquemático da modelagem apresentada anteriormente, com as entidades, relacionamentos representados pela notação clássica.
+
 ![](Etapa1_ModeloER/OSCAR_ER.png)
+
+
+### Restrições de integridade de domínio
+
+**VENCEDOR**
+
+`id_vencedor` (Chave):
+- Tipo: Numérico Inteiro (ex: INT).
+- Restrição: Único, NOT NULL
+
+`nome`:
+- Tipo: Texto.
+- Restrição: NOT NULL.
+
+`ano_nascimento`:
+- Tipo: Numérico Inteiro.
+- Restrição: Positivo, pode aceitar nulos (NULL).
+
+`data_nascimento`:
+- Tipo: Data.
+- Restrição: Formato padrão de data (YYYY-MM-DD). Pode aceitar nulos (NULL).
+
+`local_nascimento`:
+- Tipo: Texto.
+- Restrição: Texto livre, pode aceitar nulos (NULL).
+
+`etnia`:
+- Tipo: Texto.
+- Restrição: Pode aceitar nulos (NULL).
+
+`religiao`:
+- Tipo: Texto.
+- Restrição: Pode aceitar nulos (NULL).
+
+`orient_sexual`:
+- Tipo: Texto.
+- Restrição: Aceita nulos (NULL). Valores identificados como "Na" no sistema de origem devem ser convertidos e tratados formalmente como NULL no banco de dados.
+
+**FILME**
+
+`id_filme` (Chave):
+- Tipo: Numérico Inteiro.
+- Restrição: Único, NOT NULL.
+
+`titulo`:
+- Tipo: Texto.
+
+**CATEGORIA**
+
+`id_categoria` (Chave):
+- Tipo: Numérico Inteiro.
+- Restrição: Único, NOT NULL.
+
+`nome`:
+- Tipo: Texto.
+- Restrição: NOT NULL.
+
+**EDICAO**
+
+`id_edicao` (Chave):
+- Tipo: Numérico Inteiro.
+- Restrição: Único, NOT NULL.
+
+`ano`:
+- Tipo: Numérico Inteiro.
+- Restrição: O ano deve ser maior ou igual a 1927 (ano inicial da premiação no dataset).
+
+**PREMIO**
+
+`id_premio` (Chave):
+- Tipo: Numérico Inteiro.
+- Restrição: Único, NOT NULL.
+
+`id_vencedor`:
+- Tipo: Numérico Inteiro.
+
+`id_filme`:
+- Tipo: Numérico Inteiro.
+
+`id_categoria`:
+- Tipo: Numérico Inteiro.
+
+`id_edicao`:
+- Tipo: Numérico Inteiro.
 
 ---
 
 ## 4. Modelo Relacional
+
+A modelagem Entidade-Relacionamento anterior permitiu uma abordagem bem direta para a modelagem Relacional, cada entidade se tornou 1 tabela relação, a entidade associativa formou uma tabela associativa da relação M:N, constituindo-se das chaves primárias de cada uma das outras relações como chaves estrangeiras.
 
 ```
 vencedor(id_vencedor PK, nome, ano_nascimento, data_nascimento,
@@ -111,6 +200,8 @@ premio(id_premio PK,
 ---
 
 ## 5. Implementação Física
+
+A carga dos dados do csv foi feita em script python, enquanto a definição das tabelas do esquema relacional (DDL) e a validação dos dados e  foi feita em SQL.
 
 ### Banco de dados
 - **SGBD:** PostgreSQL 16 (via Docker)
