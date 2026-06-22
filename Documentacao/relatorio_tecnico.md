@@ -50,8 +50,8 @@ A base de dados utilizada, "World Oscar AMPAS winner demographics", contém dado
 | birth_date | data | Data de nascimento |
 | birthplace | texto | Local de nascimento (texto livre) |
 | race_ethnicity | texto | Etnia (6 valores: White, Black, Hispanic, Asian, Multiracial, Middle Eastern) |
-| religion | texto | Religião — 62% ausente |
-| sexual_orientation | texto | Orientação sexual — "Na" tratado como NULL |
+| religion | texto | Religião |
+| sexual_orientation | texto | Orientação sexual |
 | year_edition | inteiro | Ano da cerimônia |
 | category | texto | Categoria do Oscar (5 categorias: Melhor Atriz, Melhor Ator, Melhor Diretor, Melhor Ator Coadjuvante, Melhor Atriz Coadjuvante) |
 | movie | texto | Filme premiado |
@@ -59,7 +59,7 @@ A base de dados utilizada, "World Oscar AMPAS winner demographics", contém dado
 ### Tratamento de dados ausentes
 Foram realizadas os seguintes tratamentos na base original importada:
 
-- `religion`: 62% de ausência estrutural — dado não coletado para todos os vencedores históricos. Tratado como `NULL`.
+- `religion`: Tratado como `NULL` para valores ausentes.
 - `sexual_orientation`: string `"Na"` convertida para `NULL` na carga.
 - `birth_date`: 1 registro ausente; `birth_year` mantido para não perder informação.
 
@@ -259,7 +259,7 @@ Pipeline em Python (`Etapa3_SQL/02_carga_dados.py`) usando `psycopg2`.
 Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão no arquivo `Etapa4_EDA/05_consultas_sql.sql`.
 
 ### P1 — Quais filmes venceram mais de uma categoria na mesma cerimônia?
-*It Happened One Night* (1935), *Gone with the Wind* (1940) e *Going My Way* (1945) foram os únicos a vencer 3 categorias em uma mesma cerimônia. 60 filmes no total venceram 2 ou mais categorias.
+A Figura *"Top 15 filmes com mais categorias vencidas na mesma edição"* revela que 13 filmes no total receberam 3 das 5 categorias do Oscar na mesma cerimônia, considerando a extensão temporal da base de dados. 60 filmes no total venceram 2 ou mais categorias, o mais recente sendo Dallas Buyers Club (2014). Os filmes da Figura estão organados pelo ano de premiação.
 
 ```sql
 SELECT
@@ -279,7 +279,7 @@ ORDER BY categorias_vencidas DESC, e.ano;
 ![](Etapa4_EDA/grafico_p1_filmes_multivencedores.png)
 
 ### P2 — Como a proporção de vencedores não-brancos mudou ao longo das décadas?
-Até os anos 1970, a proporção de vencedores não-brancos foi praticamente zero. A partir dos anos 2000, subiu para cerca de 19%, ainda longe de representar a diversidade da população americana.
+Até os anos 1970, a proporção de vencedores não-brancos foi praticamente zero, atingindo no máximo cerca de 7% na década de 1950. A partir dos anos 2000, subiu para cerca de 19%, ainda longe de representar a diversidade da população americana. A Figura *"Diversidade étnica dos vencedores do Oscar por década"* mostra a variação da proporção entre brancos e não-brancos ao decorrer das décadas, o eixo esquerdo e as barras se referem aos valores absolutos, enquanto a linha vermelha e o eixo direito se referem ao valor percentual.
 
 ```sql
 SELECT
@@ -300,7 +300,7 @@ ORDER BY decada;
 ![](Etapa4_EDA/grafico_p2_diversidade_decada.png)
 
 ### P3 — Qual a idade média dos vencedores por categoria? Quem ganhou mais jovem e mais velho?
-Atrizes vencem mais jovens (média 37 anos) enquanto atores coadjuvantes vencem mais velhos (média 51). A mais jovem foi Tatum O'Neal com 11 anos (1974); o mais velho foi Christopher Plummer com 83 anos (2012).
+Atrizes vencem mais jovens (média 37 anos), a mais jovem foi Tatum O'Neal com 11 anos (Paper Moon, 1974) e a mais velha foi Peggy Ashcroft (A Passage to India, 1985) com 78 anos. Entretanto, atores coadjuvantes vencem mais velhos (média 51), o mais velho foi Christopher Plummer com 83 anos (Beginning, 2012) e o mais jovem foi Timothy Hutton (Oridnary People, 1981) com 21 anos. A Figura *"Idade dos vencedores por categoria (média e amplitude)"* mostra um gráfico com barras indicando o valor médio das idades em cada categoria, enquanto as linhas verticais delimitam o mínimo e o máximo de cada uma, respectivamente.
 
 ```sql
 SELECT
@@ -348,7 +348,7 @@ ORDER BY tipo, idade;
 ![](Etapa4_EDA/grafico_p3_idade_categoria.png)
 
 ### P4 — Entre quem ganhou mais de um Oscar, qual foi o maior intervalo de anos entre as vitórias?
-Helen Hayes esperou 39 anos entre seu primeiro (1932) e segundo Oscar (1971), o maior intervalo registrado. Katharine Hepburn também esperou 34 anos (1934–1968).
+Helen Hayes esperou 39 anos entre seu primeiro (1932) e segundo Oscar (1971), o maior intervalo registrado. Katharine Hepburn esperou 34 anos (1934–1968) e Meryl Streep esperou 29 anos (1983-2012). A Figura *"Top 10 maiores intervalos entre vitórias consecutivas"* mostra os 10 vencedores de Oscars com maiores intervalos entre premiações.
 
 ```sql
 WITH vitorias_ordenadas AS (
@@ -374,6 +374,7 @@ LIMIT 10;
 ![](Etapa4_EDA/grafico_p4_intervalo_vitorias.png)
 
 ### P5 — Em que ano cada categoria teve seu primeiro vencedor não-branco?
+A primeira categoria a contemplar um não-branco foi a de Melhor Atriz Coadjuvante, com Hattie McDaniel (Gone with the Wind, 1940), uma atriz negra. Após isso, demorou 11 anos até que Jose Ferrer entrasse como primeiro vencedor não-branco da categoria Melhor Ator (Cyrano de Bergerac, 1951).
 
 ```sql
 WITH ranking AS (
@@ -409,6 +410,6 @@ ORDER BY primeiro_ano_nao_branco;
 
 ## 8. Conclusão
 
-O projeto implementou com sucesso todas as etapas do ciclo de vida de um banco de dados relacional: modelagem ER, mapeamento relacional, normalização até 3FN, implementação DDL com restrições de integridade, pipeline de carga e análise exploratória via SQL e visualizações.
+O projeto permitiu implementar todas as etapas do ciclo de vida de um banco de dados relacional: modelagem ER com aplicação de conceitos como a entidade associativ, mapeamento relacional e verificação de normalidade até a terceira forma normal, implementação DDL com restrições de integridade, carga dos dados e análise exploratória via SQL, além da criação de visualizações utilizando *python*.
 
-Os dados revelam que a Academia de Artes e Ciências Cinematográficas demorou décadas para reconhecer artistas não-brancos, com a primeira vitória não-branca em Best Director ocorrendo apenas em 2006 — quase 80 anos após a primeira cerimônia.
+Os dados revelam que a Academia de Artes e Ciências Cinematográficas demorou décadas para reconhecer artistas não-brancos, com a primeira vitória não-branca em Melhor Diretor ocorrendo apenas em 2006 — quase 80 anos após a primeira cerimônia, mas que existe uma tendência de crescimento nas últimas décadas.
