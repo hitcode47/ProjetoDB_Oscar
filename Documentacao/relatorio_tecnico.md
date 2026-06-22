@@ -412,26 +412,3 @@ ORDER BY primeiro_ano_nao_branco;
 O projeto implementou com sucesso todas as etapas do ciclo de vida de um banco de dados relacional: modelagem ER, mapeamento relacional, normalização até 3FN, implementação DDL com restrições de integridade, pipeline de carga e análise exploratória via SQL e visualizações.
 
 Os dados revelam que a Academia de Artes e Ciências Cinematográficas demorou décadas para reconhecer artistas não-brancos, com a primeira vitória não-branca em Best Director ocorrendo apenas em 2006 — quase 80 anos após a primeira cerimônia.
-
----
-
-## Arquivos do Projeto
-
-```
-Documentacao/
-├── Etapa0_Exploracao/01_exploracao.ipynb
-├── Etapa1_ModeloER/diagrama_er.dbml
-├── Etapa3_SQL/
-│   ├── 01_ddl_criar_tabelas.sql
-│   ├── 02_carga_dados.py
-│   └── 03_validacao_carga.sql
-└── Etapa4_EDA/
-    ├── 04_perguntas_investigativas.md
-    ├── 05_consultas_sql.sql
-    └── 06_visualizacoes.ipynb
-
-Aprendizado/
-├── 00_rota_do_projeto.md
-├── 01_entidades_regras.md
-└── 02_modelo_relacional_normalizacao.md
-```
