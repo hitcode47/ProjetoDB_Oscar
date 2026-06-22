@@ -216,7 +216,7 @@ A definição das tabelas do esquema relacional (DDL) e a validação dos dados 
 - **Container:** `oscar-db`
 - **Banco:** `oscar`
 
-### Restriçãos implementadas
+### Restrições implementadas
 
 | Restrição | Tipo | Tabela |
 |---|---|---|
