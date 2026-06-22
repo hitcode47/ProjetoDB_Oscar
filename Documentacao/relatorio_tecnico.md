@@ -1,12 +1,20 @@
 ---
 output:
+  pdf_document:
+    latex_engine: xelatex
   html_document: default
-  pdf_document: default
 ---
 # Relatório — Projeto Final de Banco de Dados
 **Disciplina:** Banco de Dados — DCC/UFMG  
 **Professor:** Pedro H. Barros  
 **Dataset:** Oscar AMPAS — Winner Demographics (1927–2014)
+
+**Grupo:**
+
+1. Lucas Samuel Fernandes Andrade Oliveira,
+2. Felipe Ribas Muniz,
+3. Iury Alves Bicalho e
+4. Bruno dos Santos Lopes
 
 ---
 
@@ -57,7 +65,7 @@ Foram realizadas os seguintes tratamentos na base original importada:
 
 ---
 
-## 3. Modelo Entidade-Relacionamento
+## 3. Etapa 1: Modelo Entidade-Relacionamento
 
 ### Entidades
 
@@ -168,7 +176,7 @@ O diagrama a seguir representa o esquemático da modelagem apresentada anteriorm
 
 ---
 
-## 4. Modelo Relacional
+## 4. Etapa 2: Modelo Relacional
 
 A modelagem Entidade-Relacionamento anterior permitiu uma abordagem bem direta para a modelagem Relacional, cada entidade se tornou 1 tabela relação, a entidade associativa formou uma tabela associativa da relação M:N, constituindo-se das chaves primárias de cada uma das outras relações como chaves estrangeiras.
 
@@ -199,18 +207,18 @@ premio(id_premio PK,
 
 ---
 
-## 5. Implementação Física
+## 5. Etapa 3: Implementação Física
 
-A carga dos dados do csv foi feita em script python, enquanto a definição das tabelas do esquema relacional (DDL) e a validação dos dados e  foi feita em SQL.
+A definição das tabelas do esquema relacional (DDL) e a validação dos dados e  foi feita em SQL (arquivos `Etapa3_SQL/01_ddl_criar_tabelas.sql` e `Etapa3_SQL/03_validacao_cargas.sql`, respectivamente).
 
 ### Banco de dados
 - **SGBD:** PostgreSQL 16 (via Docker)
 - **Container:** `oscar-db`
 - **Banco:** `oscar`
 
-### Constraints implementadas
+### Restriçãos implementadas
 
-| Constraint | Tipo | Tabela |
+| Restrição | Tipo | Tabela |
 |---|---|---|
 | `id_*` únicos e não nulos | Chave primária | Todas |
 | `nome` NOT NULL | Entidade | vencedor, filme, categoria |
@@ -228,7 +236,7 @@ CREATE INDEX idx_premio_edicao    ON premio(id_edicao);
 
 ---
 
-## 6. Carga dos Dados
+## 6. Etapa 3: Carga dos Dados
 
 Pipeline em Python (`Etapa3_SQL/02_carga_dados.py`) usando `psycopg2`.
 
@@ -241,26 +249,152 @@ Pipeline em Python (`Etapa3_SQL/02_carga_dados.py`) usando `psycopg2`.
 
 **Validação pós-carga:**
 - Zero registros órfãos em todas as FKs
-- Nenhuma duplicata na constraint `uq_premio`
+- Nenhuma duplicata na restrição de negócio de `PREMIO`.
 - NULLs distribuídos como esperado (`religion`: 219, `orient_sexual`: 10)
 
 ---
 
-## 7. Análise Exploratória
+## 7. Etapa 4: Análise Exploratória
 
-### P1 — Filmes com múltiplas vitórias na mesma edição
+Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão no arquivo `Etapa4_EDA/05_consultas_sql.sql`.
+
+### P1 — Quais filmes venceram mais de uma categoria na mesma cerimônia?
 *It Happened One Night* (1935), *Gone with the Wind* (1940) e *Going My Way* (1945) foram os únicos a vencer 3 categorias em uma mesma cerimônia. 60 filmes no total venceram 2 ou mais categorias.
 
-### P2 — Diversidade étnica por década
+```sql
+SELECT
+    f.titulo,
+    e.ano,
+    COUNT(*)                                            AS categorias_vencidas,
+    STRING_AGG(c.nome, ', ' ORDER BY c.nome)           AS quais_categorias
+FROM premio p
+JOIN filme    f ON f.id_filme     = p.id_filme
+JOIN edicao   e ON e.id_edicao    = p.id_edicao
+JOIN categoria c ON c.id_categoria = p.id_categoria
+GROUP BY f.titulo, e.ano
+HAVING COUNT(*) > 1
+ORDER BY categorias_vencidas DESC, e.ano;
+```
+
+![](Etapa4_EDA/grafico_p1_filmes_multivencedores.png)
+
+### P2 — Como a proporção de vencedores não-brancos mudou ao longo das décadas?
 Até os anos 1970, a proporção de vencedores não-brancos foi praticamente zero. A partir dos anos 2000, subiu para cerca de 19%, ainda longe de representar a diversidade da população americana.
 
-### P3 — Idade dos vencedores
+```sql
+SELECT
+    (e.ano / 10) * 10                                           AS decada,
+    COUNT(*)                                                    AS total_premios,
+    COUNT(*) FILTER (WHERE v.etnia <> 'White')                  AS nao_brancos,
+    ROUND(
+        COUNT(*) FILTER (WHERE v.etnia <> 'White') * 100.0
+        / COUNT(*), 1
+    )                                                           AS pct_nao_brancos
+FROM premio p
+JOIN vencedor v ON v.id_vencedor = p.id_vencedor
+JOIN edicao   e ON e.id_edicao   = p.id_edicao
+GROUP BY decada
+ORDER BY decada;
+```
+
+![](Etapa4_EDA/grafico_p2_diversidade_decada.png)
+
+### P3 — Qual a idade média dos vencedores por categoria? Quem ganhou mais jovem e mais velho?
 Atrizes vencem mais jovens (média 37 anos) enquanto atores coadjuvantes vencem mais velhos (média 51). A mais jovem foi Tatum O'Neal com 11 anos (1974); o mais velho foi Christopher Plummer com 83 anos (2012).
 
-### P4 — Intervalo entre vitórias
+```sql
+SELECT
+    c.nome                                          AS categoria,
+    ROUND(AVG(e.ano - v.ano_nascimento), 1)         AS idade_media,
+    MIN(e.ano - v.ano_nascimento)                   AS mais_jovem,
+    MAX(e.ano - v.ano_nascimento)                   AS mais_velho
+FROM premio p
+JOIN vencedor  v ON v.id_vencedor  = p.id_vencedor
+JOIN edicao    e ON e.id_edicao    = p.id_edicao
+JOIN categoria c ON c.id_categoria = p.id_categoria
+WHERE v.ano_nascimento IS NOT NULL
+GROUP BY c.nome
+ORDER BY idade_media;
+
+```
+
+```sql
+(
+    SELECT v.nome, c.nome AS categoria, e.ano,
+           (e.ano - v.ano_nascimento) AS idade, 'mais jovem' AS tipo
+    FROM premio p
+    JOIN vencedor  v ON v.id_vencedor  = p.id_vencedor
+    JOIN edicao    e ON e.id_edicao    = p.id_edicao
+    JOIN categoria c ON c.id_categoria = p.id_categoria
+    WHERE v.ano_nascimento IS NOT NULL
+    ORDER BY idade ASC
+    LIMIT 5
+)
+UNION ALL
+(
+    SELECT v.nome, c.nome, e.ano,
+           (e.ano - v.ano_nascimento), 'mais velho'
+    FROM premio p
+    JOIN vencedor  v ON v.id_vencedor  = p.id_vencedor
+    JOIN edicao    e ON e.id_edicao    = p.id_edicao
+    JOIN categoria c ON c.id_categoria = p.id_categoria
+    WHERE v.ano_nascimento IS NOT NULL
+    ORDER BY (e.ano - v.ano_nascimento) DESC
+    LIMIT 5
+)
+ORDER BY tipo, idade;
+```
+
+![](Etapa4_EDA/grafico_p3_idade_categoria.png)
+
+### P4 — Entre quem ganhou mais de um Oscar, qual foi o maior intervalo de anos entre as vitórias?
 Helen Hayes esperou 39 anos entre seu primeiro (1932) e segundo Oscar (1971), o maior intervalo registrado. Katharine Hepburn também esperou 34 anos (1934–1968).
 
-### P5 — Primeira vitória não-branca por categoria
+```sql
+WITH vitorias_ordenadas AS (
+    SELECT
+        v.nome,
+        e.ano,
+        LAG(e.ano) OVER (PARTITION BY v.id_vencedor ORDER BY e.ano) AS ano_anterior
+    FROM premio p
+    JOIN vencedor v ON v.id_vencedor = p.id_vencedor
+    JOIN edicao   e ON e.id_edicao   = p.id_edicao
+)
+SELECT
+    nome,
+    ano_anterior  AS primeiro_oscar,
+    ano           AS segundo_oscar,
+    (ano - ano_anterior) AS intervalo_anos
+FROM vitorias_ordenadas
+WHERE ano_anterior IS NOT NULL
+ORDER BY intervalo_anos DESC
+LIMIT 10;
+```
+
+![](Etapa4_EDA/grafico_p4_intervalo_vitorias.png)
+
+### P5 — Em que ano cada categoria teve seu primeiro vencedor não-branco?
+
+```sql
+WITH ranking AS (
+    SELECT
+        c.nome                                              AS categoria,
+        v.nome                                              AS vencedor,
+        v.etnia,
+        e.ano,
+        ROW_NUMBER() OVER (PARTITION BY c.id_categoria ORDER BY e.ano) AS rn
+    FROM premio p
+    JOIN vencedor  v ON v.id_vencedor  = p.id_vencedor
+    JOIN edicao    e ON e.id_edicao    = p.id_edicao
+    JOIN categoria c ON c.id_categoria = p.id_categoria
+    WHERE v.etnia <> 'White'
+)
+SELECT categoria, vencedor, etnia, ano AS primeiro_ano_nao_branco
+FROM ranking
+WHERE rn = 1
+ORDER BY primeiro_ano_nao_branco;
+```
+
 | Categoria | Vencedor | Etnia | Ano |
 |---|---|---|---|
 | Best Supporting Actress | Hattie McDaniel | Black | 1940 |
@@ -268,6 +402,8 @@ Helen Hayes esperou 39 anos entre seu primeiro (1932) e segundo Oscar (1971), o 
 | Best Supporting Actor | Anthony Quinn | Hispanic | 1953 |
 | Best Actress | Halle Berry | Multiracial | 2002 |
 | Best Director | Ang Lee | Asian | 2006 |
+
+![](Etapa4_EDA/grafico_p5_primeira_vitoria_nao_branca.png)
 
 ---
 
