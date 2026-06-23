@@ -8,11 +8,10 @@ Table vencedor {
   id_vencedor      integer     [primary key]
   nome             varchar     [not null]
   ano_nascimento   integer
-  data_nascimento  date
   local_nascimento varchar     [note: 'texto livre: cidade, estado, país']
-  etnia            varchar     [not null]
-  religiao         varchar     [note: 'nullable — 62% ausente no dataset']
-  orient_sexual    varchar     [note: 'nullable — "Na" tratado como NULL']
+  id_etnia         integer     [not null, ref: > etnia.id_etnia]
+  id_religiao      integer     [note: 'nullable — 62% ausente no dataset', ref: > religiao.id_religiao]
+  id_orient        integer     [note: 'nullable — "Na" tratado como NULL', ref: > orientacao_sexual.id_orient]
 }
 
 Table filme {
@@ -36,4 +35,19 @@ Table premio {
   id_filme     integer [not null, ref: > filme.id_filme]
   id_categoria integer [not null, ref: > categoria.id_categoria]
   id_edicao    integer [not null, ref: > edicao.id_edicao]
+}
+
+Table orientacao_sexual {
+  id_orient   integer [primary key]
+  nome_orient varchar [not null, unique]
+}
+
+Table religiao {
+  id_religiao   integer [primary key]
+  nome_religiao varchar [not null, unique]
+}
+
+Table etnia {
+  id_etnia   integer [primary key]
+  nome_etnia varchar [not null, unique]
 }
