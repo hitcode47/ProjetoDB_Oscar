@@ -51,6 +51,7 @@ CREATE TABLE vencedor (
     religiao         VARCHAR(100),
     orient_sexual    VARCHAR(50),
     CONSTRAINT uq_vencedor_nome UNIQUE (nome)
+    CONSTRAINT chk_mesmo_ano CHECK (ano_nascimento = EXTRACT(YEAR FROM data_nascimento))
 );
 
 -- -------------------------------------------------------------

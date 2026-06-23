@@ -23,7 +23,7 @@ from psycopg2.extras import execute_values
 # Configuração
 # =============================================================
 
-CSV_PATH = r'C:\Users\bruno\OneDrive\Área de Trabalho\Projetos\projetoFinalDB\world_ampas_oscar_winner_demographics.csv'
+CSV_PATH = r'..\..\world_ampas_oscar_winner_demographics.csv'
 
 DB = {
     "host":     "localhost",
