@@ -25,7 +25,7 @@ Este projeto implementa o ciclo completo de um banco de dados relacional sobre o
 As etapas de um projeto de banco de dados desenvolvidas partem do projeto conceitual Entidade-Relacionamento, que é depois convertido num modelo Relacional e testado sobre as premissas das 3 formas normais. Os modelos projetados são então implementados em SQL por meio da Data Definition language (DDL) e a base de dados resultante é populada com o arquivo csv. Antes de se executar as análises e consultas SQL, um tratamento é feito, seguido da análise exploratópria dos dados.
 
 ### Motivação
-O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o perfil dos vencedores ao longo do tempo revela padrões históricos de diversidade — ou ausência dela — na indústria do cinema.
+O Oscar é a premiação cinematográfica mais influente do mundo. Analisar o perfil dos vencedores ao longo do tempo revela padrões históricos de diversidade na indústria do cinema.
 
 ---
 
@@ -199,11 +199,13 @@ premio(id_premio PK,
 
 ### Normalização
 
-**1FN:** todos os valores são atômicos. `local_nascimento` é texto livre, mas atômico por linha.
+O processo de normalização para a base de dados escolhida se deu de maneira mais simples, por se tratar de uma base de dados com poucas colunas. As avaliações para cada forma normal para as tabelas modeladas anteriormente se da da seguinte maneira:
 
-**2FN:** todas as tabelas têm chave primária simples — dependências parciais são impossíveis.
+**1FN:** todos os valores são atômicos em todas as tabelas;
 
-**3FN:** único caso analisado foi `ano_nascimento` vs `data_nascimento` em VENCEDOR. Optou-se por manter ambos pois há 1 registro com `birth_year` mas sem `birth_date` completa — eliminar a coluna causaria perda real de informação. Não há dependências transitivas nas demais tabelas.
+**2FN:** todas as tabelas têm chave primária simples, portanto dependências parciais são impossíveis;
+
+**3FN:** o único caso observado foi `ano_nascimento` e `data_nascimento` na tabela VENCEDOR. Optou-se por manter ambos pois há 1 registro com `birth_year`, mas sem `birth_date`, mas adicionou-se a restrição de integridade CHECK para que o ano_nascimento seja o mesmo presente em data_nascimento. Não há dependências transitivas nas demais tabelas.
 
 ---
 
@@ -223,6 +225,7 @@ A definição das tabelas do esquema relacional (DDL) e a validação dos dados 
 | `id_*` únicos e não nulos | Chave primária | Todas |
 | `nome` NOT NULL | Entidade | vencedor, filme, categoria |
 | `ano >= 1927` | Domínio | edicao |
+| ano_nascimento = YEAR(data_nascimento) | Consistência | Vencedor |
 | FKs referenciam registros existentes | Referencial | premio |
 | `(id_vencedor, id_categoria, id_edicao)` único | Negócio | premio |
 
