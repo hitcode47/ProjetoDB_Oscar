@@ -256,7 +256,7 @@ Pipeline em Python (`Etapa3_SQL/02_carga_dados.py`) usando `psycopg2`.
 
 ## 7. Etapa 4: Análise Exploratória
 
-Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão no arquivo `Etapa4_EDA/05_consultas_sql.sql`.
+Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão nos arquivos `Etapa4_EDA/p*.sql`.
 
 ### P1 — Quais filmes venceram mais de uma categoria na mesma cerimônia?
 *It Happened One Night* (1935), *Gone with the Wind* (1940) e *Going My Way* (1945) foram os únicos a vencer 3 categorias em uma mesma cerimônia. 60 filmes no total venceram 2 ou mais categorias.
