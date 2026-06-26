@@ -187,10 +187,10 @@ categoria(id_categoria PK, nome)
 edicao(id_edicao PK, ano)
 
 premio(id_premio PK,
-       id_vencedor FK → vencedor,
-       id_filme    FK → filme,
-       id_categoria FK → categoria,
-       id_edicao   FK → edicao)
+       id_vencedor FK > vencedor,
+       id_filme    FK > filme,
+       id_categoria FK > categoria,
+       id_edicao   FK > edicao)
 ```
 
 ### Normalização
