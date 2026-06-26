@@ -436,6 +436,11 @@ ORDER BY primeiro_ano_nao_branco;
 
 ![](Etapa4_EDA/grafico_p5_primeira_vitoria_nao_branca.png)
 
+### P6 - Quais os países mais contemplados com vitórias além dos Estados Unidos?
+Entre 1927 e 2014, a maior parte das vitórias se concentra nas mãos de americanos, com 269 prêmios no total, mas nas posições seguintes, apresentam-se vários países europeus, como a Inglaterra, com 54 e depois França, com 9 prêmios. Também se incluem no topo o Canadá, Itália, País de Gales, Áustria, Japão, Alemanha e Austrália. A Figura a seguir mostra um gráfico com uma comparação dos quantitativos, em escala logarítmica, de prêmios por país.
+
+![](Etapa4_EDA/grafico_p6a_premios_por_pais_barras.png)
+
 ---
 
 ## 8. Conclusão
