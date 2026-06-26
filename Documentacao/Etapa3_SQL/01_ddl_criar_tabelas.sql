@@ -4,19 +4,15 @@
 -- =============================================================
 
 -- Remove tabelas na ordem correta (dependentes primeiro)
-DROP TABLE IF EXISTS premio    CASCADE;
-DROP TABLE IF EXISTS vencedor  CASCADE;
-DROP TABLE IF EXISTS filme     CASCADE;
-DROP TABLE IF EXISTS categoria CASCADE;
-DROP TABLE IF EXISTS edicao    CASCADE;
-
--- Remove tabelas do schema anterior (Brasileirão)
-DROP TABLE IF EXISTS partida   CASCADE;
-DROP TABLE IF EXISTS temporada CASCADE;
-DROP TABLE IF EXISTS time      CASCADE;
-DROP TABLE IF EXISTS estadio   CASCADE;
-DROP TABLE IF EXISTS arbitro   CASCADE;
-DROP TABLE IF EXISTS tecnico   CASCADE;
+DROP TABLE IF EXISTS premio         CASCADE;
+DROP TABLE IF EXISTS filme          CASCADE;
+DROP TABLE IF EXISTS categoria      CASCADE;
+DROP TABLE IF EXISTS pais           CASCADE;
+DROP TABLE IF EXISTS etnia          CASCADE;
+DROP TABLE IF EXISTS religiao       CASCADE;
+DROP TABLE IF EXISTS orient_sexual  CASCADE;
+DROP TABLE IF EXISTS vencedor       CASCADE;
+DROP TABLE IF EXISTS edicao         CASCADE;
 
 -- -------------------------------------------------------------
 -- Tabelas de domínio (sem FKs)
@@ -41,17 +37,31 @@ CREATE TABLE filme (
     CONSTRAINT uq_filme_titulo UNIQUE (titulo)
 );
 
+CREATE TABLE pais (
+    nome_pais VARCHAR(255) PRIMARY KEY
+);
+
+CREATE TABLE etnia (
+    nome_etnia VARCHAR(50) PRIMARY KEY
+);
+
+CREATE TABLE religiao (
+    nome_religiao VARCHAR(100) PRIMARY KEY
+);
+
+CREATE TABLE orient_sexual (
+    nome_orient_sexual VARCHAR(50) PRIMARY KEY
+);
+
 CREATE TABLE vencedor (
     id_vencedor      SERIAL PRIMARY KEY,
     nome             VARCHAR(150) NOT NULL,
     ano_nascimento   INTEGER,
-    data_nascimento  DATE,
-    local_nascimento VARCHAR(200),
-    etnia            VARCHAR(50)  NOT NULL,
-    religiao         VARCHAR(100),
-    orient_sexual    VARCHAR(50),
+    pais_nascimento  VARCHAR(200) NOT NULL REFERENCES pais(nome_pais),
+    nome_etnia            VARCHAR(50)  NOT NULL REFERENCES etnia(nome_etnia),
+    nome_religiao         VARCHAR(100) REFERENCES religiao(nome_religiao),
+    nome_orient_sexual    VARCHAR(50) REFERENCES orient_sexual(nome_orient_sexual),
     CONSTRAINT uq_vencedor_nome UNIQUE (nome)
-    CONSTRAINT chk_mesmo_ano CHECK (ano_nascimento = EXTRACT(YEAR FROM data_nascimento))
 );
 
 -- -------------------------------------------------------------

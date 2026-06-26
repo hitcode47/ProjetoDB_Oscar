@@ -197,8 +197,8 @@ Documento de texto com as 5 perguntas investigativas formuladas antes de escreve
 
 ---
 
-#### `05_consultas_sql.sql`
-Arquivo SQL com as 6 consultas analíticas (P1, P2, P3a, P3b, P4, P5).
+#### `p1.sql`, `p2.sql`, ..., `p5.sql`
+Arquivos SQL com as 5 consultas analíticas (P1, P2, P3, P4, P5).
 
 **Como executar:**
 ```powershell

@@ -107,17 +107,13 @@ O diagrama a seguir representa o esquemático da modelagem apresentada anteriorm
 - Tipo: Numérico Inteiro.
 - Restrição: Positivo, pode aceitar nulos (NULL).
 
-`data_nascimento`:
-- Tipo: Data.
-- Restrição: Formato padrão de data (YYYY-MM-DD). Pode aceitar nulos (NULL).
-
 `local_nascimento`:
-- Tipo: Texto.
-- Restrição: Texto livre, pode aceitar nulos (NULL).
+- Tipo: Composto {cidade, estado, país}
+- Restrição: para cada atributo, texto livre, podem aceitar nulos (NULL).
 
 `etnia`:
 - Tipo: Texto.
-- Restrição: Pode aceitar nulos (NULL).
+- Restrição: NOT NULL.
 
 `religiao`:
 - Tipo: Texto.
@@ -191,21 +187,52 @@ categoria(id_categoria PK, nome)
 edicao(id_edicao PK, ano)
 
 premio(id_premio PK,
-       id_vencedor FK → vencedor,
-       id_filme    FK → filme,
-       id_categoria FK → categoria,
-       id_edicao   FK → edicao)
+       id_vencedor FK > vencedor,
+       id_filme    FK > filme,
+       id_categoria FK > categoria,
+       id_edicao   FK > edicao)
 ```
 
 ### Normalização
 
 O processo de normalização para a base de dados escolhida se deu de maneira mais simples, por se tratar de uma base de dados com poucas colunas. As avaliações para cada forma normal para as tabelas modeladas anteriormente se da da seguinte maneira:
 
-**1FN:** todos os valores são atômicos em todas as tabelas;
+**1FN:** a tabela `VENCEDOR` contém um atributo composto `local_nascimento`. Como as informações de estado e cidade não seriam de interesse, elas foram descartadas e o atributo composto foi transofrmado em uma chave estrangeira que referencia uma nova tabela para o país de nascimento, com o intuito de garantir consistência no nome dos países.
 
 **2FN:** todas as tabelas têm chave primária simples, portanto dependências parciais são impossíveis;
 
-**3FN:** o único caso observado foi `ano_nascimento` e `data_nascimento` na tabela VENCEDOR. Optou-se por manter ambos pois há 1 registro com `birth_year`, mas sem `birth_date`, mas adicionou-se a restrição de integridade CHECK para que o ano_nascimento seja o mesmo presente em data_nascimento. Não há dependências transitivas nas demais tabelas.
+**3FN:** o único caso observado foi `ano_nascimento` e `data_nascimento` na tabela `VENCEDOR`. Optou-se por manter `birth_year`, removendo `birth_date` da tabela, já que `birth_year` estava completa para todas as entradas. Não há dependências transitivas nas demais tabelas.
+
+Também para padronizar e garantir consistência, as variáveis etnia, religiao e orient_sexual foram transformadas em chaves estrangeiras para novas tabelas com as respectivas informações. O esquema resultante é mostrado na tabela a seguir:
+
+
+```
+vencedor(id_vencedor PK, nome, ano_nascimento, data_nascimento,
+         pais_nascimento FK > pais, 
+         etnia FK > etnia,
+         religiao FK > religiao,
+         orient_sexual FK > orient_sexual)
+
+filme(id_filme PK, titulo)
+
+categoria(id_categoria PK, nome)
+
+edicao(id_edicao PK, ano)
+
+pais(nome_pais PK)
+
+etnia(nome_etnia PK)
+
+religiao(nome_religiao PK)
+
+orient_sexual(nome_orient_sexual PK)
+
+premio(id_premio PK,
+       id_vencedor FK > vencedor,
+       id_filme    FK > filme,
+       id_categoria FK > categoria,
+       id_edicao   FK > edicao)
+```
 
 ---
 
@@ -259,7 +286,7 @@ Pipeline em Python (`Etapa3_SQL/02_carga_dados.py`) usando `psycopg2`.
 
 ## 7. Etapa 4: Análise Exploratória
 
-Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão no arquivo `Etapa4_EDA/05_consultas_sql.sql`.
+Com o banco populado, formulamos perguntas que exploram padrões históricos de diversidade, prestígio e longevidade de carreira entre os vencedores do Oscar (1927–2014). As consultas completas estão nos arquivos `Etapa4_EDA/p*.sql`.
 
 ### P1 — Quais filmes venceram mais de uma categoria na mesma cerimônia?
 A Figura *"Top 15 filmes com mais categorias vencidas na mesma edição"* revela que 13 filmes no total receberam 3 das 5 categorias do Oscar na mesma cerimônia, considerando a extensão temporal da base de dados. 60 filmes no total venceram 2 ou mais categorias, o mais recente sendo Dallas Buyers Club (2014). Os filmes da Figura estão organados pelo ano de premiação.
@@ -408,6 +435,11 @@ ORDER BY primeiro_ano_nao_branco;
 | Best Director | Ang Lee | Asian | 2006 |
 
 ![](Etapa4_EDA/grafico_p5_primeira_vitoria_nao_branca.png)
+
+### P6 - Quais os países mais contemplados com vitórias além dos Estados Unidos?
+Entre 1927 e 2014, a maior parte das vitórias se concentra nas mãos de americanos, com 269 prêmios no total, mas nas posições seguintes, apresentam-se vários países europeus, como a Inglaterra, com 54 e depois França, com 9 prêmios. Também se incluem no topo o Canadá, Itália, País de Gales, Áustria, Japão, Alemanha e Austrália. A Figura a seguir mostra um gráfico com uma comparação dos quantitativos, em escala logarítmica, de prêmios por país.
+
+![](Etapa4_EDA/grafico_p6a_premios_por_pais_barras.png)
 
 ---
 
