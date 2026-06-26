@@ -190,7 +190,7 @@ try:
 
             cur.execute("SELECT nome_orient_sexual FROM orient_sexual")
             count = len(cur.fetchall())
-            print(f"etnia     : {count} registros")
+            print(f"orient_sexual     : {count} registros")
 
         # Religiões
         with conn.cursor() as cur:
